@@ -31,7 +31,7 @@ async def on_message(message):
             await message.channel.send('Forbidden characters found!')
             return
 
-        await message.channel.send(f'The answer to {content} is {calculate(content)}')
+        await message.channel.send(f'The answer is {calculate(content)}')
 
 
 def valid(content):
