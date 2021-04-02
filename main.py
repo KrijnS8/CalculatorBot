@@ -39,7 +39,7 @@ def valid(content):
     :param content: message to check
     :return: true or false
     """
-    allowed_chars = set('1234567890+-*/')
+    allowed_chars = set('1234567890+-x/')
 
     for char in range(len(content)):
         if not any((c in allowed_chars) for c in content[char]):
@@ -62,8 +62,8 @@ def calculate(content):
 
         if '/' in parts:
             index = parts.index('/')
-        elif '*' in parts:
-            index = parts.index('*')
+        elif 'x' in parts:
+            index = parts.index('x')
         elif '+' in parts:
             index = parts.index('+')
         elif '-' in parts:
@@ -77,7 +77,7 @@ def calculate(content):
             output = first_number + second_number
         if operator == '-':
             output = first_number - second_number
-        if operator == '*':
+        if operator == 'x':
             output = first_number * second_number
         if operator == '/':
             output = first_number / second_number
