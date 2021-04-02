@@ -40,7 +40,7 @@ def valid(content):
     :param content: message to check
     :return: true or false
     """
-    allowed_chars = set('1234567890+-*/=')
+    allowed_chars = set('1234567890+-*/')
 
     for char in range(len(content)):
         if not any((c in allowed_chars) for c in content[char]):
@@ -55,7 +55,41 @@ def calculate(content):
     :param content: equation to calculate
     :return: answer to equation
     """
-    print(group_parts(content))
+    parts = group_parts(content)
+    output = 0
+
+    while len(parts) > 1:
+        first_number = 0
+        second_number = 0
+        operator = ''
+        index = 0
+
+        if '/' in parts:
+            index = parts.index('/')
+        elif '*' in parts:
+            index = parts.index('*')
+        elif '+' in parts:
+            index = parts.index('+')
+        elif '-' in parts:
+            index = parts.index('-')
+
+        first_number = int(parts[index - 1])
+        operator = parts[index]
+        second_number = int(parts[index + 1])
+
+        if operator == '+':
+            output = first_number + second_number
+        if operator == '-':
+            output = first_number - second_number
+        if operator == '*':
+            output = first_number * second_number
+        if operator == '/':
+            output = first_number / second_number
+
+        parts[index + 1] = output
+        del parts[index - 1:index + 1]
+
+    return output
 
 
 def group_parts(content):
