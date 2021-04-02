@@ -1,6 +1,10 @@
 import discord
 import logging
 from discord.ext import commands
+import yaml
+
+with open(r'config.yml') as file:
+    config = yaml.full_load(file)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -78,4 +82,4 @@ def group_parts(content):
     return parts
 
 
-client.run('ODIzNjE4NzMwNTU4NzUwNzcw.YFjctw.o4K4krhJSfGf3ZwVfKejzFv00DE')
+client.run(config['apiKey'])
