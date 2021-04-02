@@ -59,9 +59,6 @@ def calculate(content):
     output = 0
 
     while len(parts) > 1:
-        first_number = 0
-        second_number = 0
-        operator = ''
         index = 0
 
         if '/' in parts:
