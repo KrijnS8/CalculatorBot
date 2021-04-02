@@ -1,6 +1,5 @@
 import discord
 import logging
-from discord.ext import commands
 import yaml
 
 with open(r'config.yml') as file:
