@@ -30,7 +30,7 @@ async def on_message(message):
             await message.channel.send('Forbidden characters found!')
             return
 
-        await message.channel.send(f'The answer is {calculate(content)}')
+        await message.channel.send(f'The answer is {calculate(group_parts(content))}')
 
 
 def valid(content):
@@ -39,7 +39,7 @@ def valid(content):
     :param content: message to check
     :return: true or false
     """
-    allowed_chars = set('1234567890+-x/')
+    allowed_chars = set('1234567890+-x/()')
 
     for char in range(len(content)):
         if not any((c in allowed_chars) for c in content[char]):
@@ -48,17 +48,23 @@ def valid(content):
     return True
 
 
-def calculate(content):
+def calculate(parts):
     """
     Calculates the equation given
-    :param content: equation to calculate
+    :param parts: equation to calculate
     :return: answer to equation
     """
-    parts = group_parts(content)
     output = 0
 
     while len(parts) > 1:
         index = 0
+
+        if '(' in parts:
+            opening_bracket = parts.index('(')
+            closing_bracket = list_rindex(parts, ')')
+
+            parts[closing_bracket] = calculate(parts[opening_bracket + 1:closing_bracket])
+            del parts[opening_bracket:closing_bracket]
 
         if '/' in parts:
             index = parts.index('/')
@@ -86,6 +92,10 @@ def calculate(content):
         del parts[index - 1:index + 1]
 
     return output
+
+
+def list_rindex(lst, value):
+    return len(lst) - lst[-1::-1].index(value) - 1
 
 
 def group_parts(content):
