@@ -28,7 +28,6 @@ async def on_message(message):
             content += message.content[i]
 
         solution = calculate(content)
-        print(solution)
 
         if not solution and solution != 0:
             await message.channel.send('The given equation is invalid')
