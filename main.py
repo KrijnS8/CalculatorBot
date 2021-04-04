@@ -1,6 +1,7 @@
 import discord
 import logging
 import yaml
+import string
 
 with open(r'config.yml') as file:
     config = yaml.full_load(file)
@@ -20,41 +21,33 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('.calculate'):
+    if message.content.startswith('!calculate'):
 
         content = ''
-        for i in range(len('.calculate '), len(message.content)):
+        for i in range(len('!calculate '), len(message.content)):
             content += message.content[i]
 
-        if not valid(content):
-            await message.channel.send('Forbidden characters found!')
+        solution = calculate(content)
+        print(solution)
+
+        if not solution and solution != 0:
+            await message.channel.send('The given equation is invalid')
             return
 
-        await message.channel.send(f'The answer is {calculate(group_parts(content))}')
+        await message.channel.send(f'The answer is {solution}')
 
 
-def valid(content):
-    """
-    Checks for invalid characters
-    :param content: message to check
-    :return: true or false
-    """
-    allowed_chars = set('1234567890+-x/()')
-
-    for char in range(len(content)):
-        if not any((c in allowed_chars) for c in content[char]):
-            return False
-
-    return True
-
-
-def calculate(parts):
+def calculate(content):
     """
     Calculates the equation given
-    :param parts: equation to calculate
+    :param content: equation to calculate
     :return: answer to equation
     """
+    parts = group_parts(content)
     output = 0
+
+    if not valid(parts):
+        return False
 
     while len(parts) > 1:
         index = 0
@@ -94,14 +87,35 @@ def calculate(parts):
     return output
 
 
-def list_rindex(lst, value):
-    return len(lst) - lst[-1::-1].index(value) - 1
+def valid(parts):
+    """
+    Checks if equation is valid
+    :param parts: equation to check
+    :return: true or false
+    """
+    allowed_chars = set('1234567890+-x/()')
+    operators = '+-x/'
+
+    for i in range(len(parts)):
+        if not set(parts[i]) <= allowed_chars:
+            print('Invalid characters found')
+            return False
+
+        if parts[i] in operators and parts[i + 1] in operators:
+            print('Multiple operators in between numbers')
+            return False
+
+        if parts[0] in operators or parts[len(parts) - 1] in operators:
+            print('Equation starts or ends with operator')
+            return False
+
+    return True
 
 
 def group_parts(content):
     """
-    Groups message into appropriate parts
-    :param content: message to check
+    Groups equation into appropriate parts
+    :param content: equation to check
     :return: list with all parts
     """
     parts = ['']
@@ -120,6 +134,10 @@ def group_parts(content):
     parts[selection] += content[len(content) - 1]
 
     return parts
+
+
+def list_rindex(lst, value):
+    return len(lst) - lst[-1::-1].index(value) - 1
 
 
 client.run(config['apiKey'])
