@@ -1,7 +1,6 @@
 import discord
 import logging
 import yaml
-import string
 
 with open(r'config.yml') as file:
     config = yaml.full_load(file)
@@ -39,11 +38,16 @@ async def on_message(message):
 def calculate(content):
     """
     Calculates the equation given
-    :param content: equation to calculate
-    :return: answer to equation
+    :param content: equation to calculate (string)
+    :return: answer to equation (float)
     """
-    parts = group_parts(content)
     output = 0
+
+    if isinstance(content, str):
+        parts = group_parts(content)
+        print('string')
+    else:
+        parts = content
 
     if not valid(parts):
         return False
@@ -89,8 +93,8 @@ def calculate(content):
 def valid(parts):
     """
     Checks if equation is valid
-    :param parts: equation to check
-    :return: true or false
+    :param parts: equation to check (array)
+    :return: true or false (boolean)
     """
     allowed_chars = set('1234567890+-x/()')
     operators = '+-x/'
@@ -114,8 +118,8 @@ def valid(parts):
 def group_parts(content):
     """
     Groups equation into appropriate parts
-    :param content: equation to check
-    :return: list with all parts
+    :param content: equation to check (string)
+    :return: list with all parts (array)
     """
     parts = ['']
     numbers = set('1234567890')
