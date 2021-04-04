@@ -67,9 +67,9 @@ def calculate(content):
         elif '-' in parts:
             index = parts.index('-')
 
-        first_number = int(parts[index - 1])
+        first_number = float(parts[index - 1])
         operator = parts[index]
-        second_number = int(parts[index + 1])
+        second_number = float(parts[index + 1])
 
         if operator == '+':
             output = first_number + second_number
@@ -122,10 +122,9 @@ def group_parts(content):
     selection = 0
 
     for i in range(len(content) - 1):
-        if any((n in numbers) for n in content[i]):
-            if any((n in numbers) for n in content[i + 1]):
-                parts[selection] += content[i]
-                continue
+        if set(content[i]) <= numbers and set(content[i + 1]) <= numbers:
+            parts[selection] += content[i]
+            continue
 
         parts[selection] += content[i]
         selection += 1
