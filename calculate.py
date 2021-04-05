@@ -1,4 +1,3 @@
-
 def calculate(content):
     """
     Calculates the equation given
@@ -59,7 +58,7 @@ def calculate(content):
     return output
 
 
-def valid(parts):
+def valid(parts) -> bool:
     """
     Checks if equation is valid
     :param parts: equation to check (array)
@@ -84,7 +83,7 @@ def valid(parts):
     return True
 
 
-def group_parts(content):
+def group_parts(content) -> list[str]:
     """
     Groups equation into appropriate parts
     :param content: equation to check (string)
