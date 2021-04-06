@@ -103,20 +103,35 @@ class PI(Expression):
         return pi
 
 
-# e1 = Division(Number(42), Zero())
-# print(e1.evaluate())
-# # e = Addition(Minus(Number(42)), Sqrt(Number(420)))
-# # print(e.evaluate())
-
-
 def parse(s: str) -> Expression:
-    if s.startswith('sqrt(') and s.endswith(')'):
-        return Sqrt(parse(s[5:-1]))
-
     if s[0].isdigit():
-        return Number(float(s[0]))
+        l1 = number_length(s)
+        if l1 < len(s) and s[l1] == '/':
+            l2: int = number_length(s[l1 + 1:])
+            n1 = Number(float(s[0: l1]))
+            n2 = Number(float(s[l1+1: l1+l2+1]))
+            return parse(str(Division(n1, n2).evaluate()) + s[l1+l2+1:])
+
+        if l1 < len(s) and s[l1] == '+':
+            l2: int = number_length(s[l1+1:])
+            n1 = Number(float(s[0: l1]))
+            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
+            return parse(str(Addition(n1, n2).evaluate()) + s[l1+l2+1:])
+
+        return Number(float(s[0:l1]))
 
 
-# e = parse('sqrt(sqrt(3))')
-# print(e.evaluate())
+def number_length(s: str):
+    length = 1
+    if not s[0].isdigit():
+        raise Exception('The first character in the string is not a digit')
+    while 1:
+        if length > len(s) - 1 or not s[length].isdigit() and s[length] != '.':
+            return length
+        length += 1
 
+
+e1 = parse('2.5/2')
+print(e1.evaluate())
+
+# 2+(3*4)
