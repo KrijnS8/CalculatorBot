@@ -109,14 +109,26 @@ def parse(s: str) -> Expression:
         if l1 < len(s) and s[l1] == '/':
             l2: int = number_length(s[l1 + 1:])
             n1 = Number(float(s[0: l1]))
-            n2 = Number(float(s[l1+1: l1+l2+1]))
-            return parse(str(Division(n1, n2).evaluate()) + s[l1+l2+1:])
+            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
+            return parse(str(Division(n1, n2).evaluate()) + s[l1 + l2 + 1:])
 
-        if l1 < len(s) and s[l1] == '+':
-            l2: int = number_length(s[l1+1:])
+        if l1 < len(s) and s[l1] == 'x':
+            l2: int = number_length(s[l1 + 1:])
             n1 = Number(float(s[0: l1]))
             n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
-            return parse(str(Addition(n1, n2).evaluate()) + s[l1+l2+1:])
+            return parse(str(Multiplication(n1, n2).evaluate()) + s[l1 + l2 + 1:])
+
+        if l1 < len(s) and s[l1] == '+':
+            l2: int = number_length(s[l1 + 1:])
+            n1 = Number(float(s[0: l1]))
+            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
+            return Addition(n1, parse(s[l1 + 1:]))
+
+        if l1 < len(s) and s[l1] == '+':
+            l2: int = number_length(s[l1 + 1:])
+            n1 = Number(float(s[0: l1]))
+            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
+            return Subtraction(n1, parse(s[l1 + 1:]))
 
         return Number(float(s[0:l1]))
 
@@ -131,7 +143,5 @@ def number_length(s: str):
         length += 1
 
 
-e1 = parse('2.5/2')
+e1 = parse('10+2x2/2')
 print(e1.evaluate())
-
-# 2+(3*4)
