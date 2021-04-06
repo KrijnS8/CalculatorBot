@@ -14,7 +14,6 @@ class Number(Expression):
         self.value = v
 
     def evaluate(self) -> float:
-        print(f'Evaluate number: {self.value}')
         return self.value
 
 
@@ -31,7 +30,6 @@ class Addition(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate addition: {v1, v2}')
         return v1 + v2
 
 
@@ -39,7 +37,6 @@ class Subtraction(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate subtraction: {v1, v2}')
         return v1 - v2
 
 
@@ -47,7 +44,6 @@ class Multiplication(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate multiplication: {v1, v2}')
         return v1 * v2
 
 
@@ -59,7 +55,6 @@ class Division(BinaryFunction):
         if v2 == 0:
             raise Exception('Division by zero')
 
-        print(f'Evaluate division: {v1, v2}')
         return v1 / v2
 
 
@@ -73,33 +68,23 @@ class UnaryFunction(Expression):
 class Minus(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate minus: {-v}')
         return -v
 
 
 class Sqrt(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate sqrt: {v}')
         return sqrt(v)
 
 
 class Parenthesis(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate parenthesis: {v}')
         return v
-
-
-class Zero(Expression):
-    def evaluate(self) -> float:
-        print('Evaluate zero: 0')
-        return 0
 
 
 class PI(Expression):
     def evaluate(self) -> float:
-        print(f'Evaluate PI: {pi}')
         return pi
 
 
@@ -129,7 +114,7 @@ def parse(s: str) -> Expression:
         return Number(float(s[0:l1]))
 
 
-def number_length(s: str):
+def number_length(s: str) -> int:
     length = 1
     if not s[0].isdigit():
         raise Exception('The first character in the string is not a digit')
@@ -139,5 +124,5 @@ def number_length(s: str):
         length += 1
 
 
-e1 = parse('1+2-3')
-print(e1.evaluate())
+x = parse('7x4')
+print(x.evaluate())

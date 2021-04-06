@@ -2,6 +2,7 @@ import discord
 import logging
 import yaml
 import calculate
+import expression
 
 with open(r'config.yml') as file:
     config = yaml.full_load(file)
@@ -23,11 +24,8 @@ async def on_message(message):
 
     if message.content.startswith('!calculate'):
 
-        content = ''
-        for i in range(len('!calculate '), len(message.content)):
-            content += message.content[i]
-
-        solution = calculate.calculate(content)
+        content = message.content[len('!calculate '):]
+        solution = expression.parse(content).evaluate()
 
         if not solution and solution != 0:
             await message.channel.send('The given equation is invalid')
