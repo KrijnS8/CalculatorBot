@@ -1,5 +1,5 @@
 from abc import ABC
-from math import sqrt
+from math import sqrt, pi
 
 
 class Expression(ABC):
@@ -97,6 +97,12 @@ class Zero(Expression):
         return 0
 
 
+class PI(Expression):
+    def evaluate(self) -> float:
+        print(f'Evaluate PI: {pi}')
+        return pi
+
+
 # e1 = Division(Number(42), Zero())
 # print(e1.evaluate())
 # # e = Addition(Minus(Number(42)), Sqrt(Number(420)))
@@ -111,5 +117,6 @@ def parse(s: str) -> Expression:
         return Number(float(s[0]))
 
 
-e = parse('sqrt(sqrt(3))')
-print(e.evaluate())
+# e = parse('sqrt(sqrt(3))')
+# print(e.evaluate())
+

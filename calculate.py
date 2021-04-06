@@ -1,3 +1,6 @@
+from typing import List
+
+
 def calculate(content):
     """
     Calculates the equation given
@@ -83,7 +86,7 @@ def valid(parts) -> bool:
     return True
 
 
-def group_parts(content) -> list[str]:
+def group_parts(content) -> List[str]:
     """
     Groups equation into appropriate parts
     :param content: equation to check (string)
