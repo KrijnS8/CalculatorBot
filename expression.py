@@ -88,41 +88,52 @@ class PI(Expression):
         return pi
 
 
-def parse(s: str) -> Expression:
-    if s[0].isdigit():
-        l1 = number_length(s)
-        if l1 < len(s) and s[l1] == '/':
-            l2: int = number_length(s[l1 + 1:])
-            n1 = Number(float(s[0: l1]))
-            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
-            return parse(str(Division(n1, n2).evaluate()) + s[l1 + l2 + 1:])
+def infix_to_prefix(s) -> str:
+    stack: list = ['(']
+    infix: str = f'{reverse_string(s)})'
+    output: str = ''
 
-        if l1 < len(s) and s[l1] == 'x':
-            l2: int = number_length(s[l1 + 1:])
-            n1 = Number(float(s[0: l1]))
-            n2 = Number(float(s[l1 + 1: l1 + l2 + 1]))
-            return parse(str(Multiplication(n1, n2).evaluate()) + s[l1 + l2 + 1:])
+    for char in infix:
+        if char.isdigit():
+            output = f'{output}{char}'
 
-        if l1 < len(s) and s[l1] == '+':
-            n1 = Number(float(s[0: l1]))
-            return Addition(n1, parse(s[l1 + 1:]))
+        if char == '(':
+            stack.append(char)
 
-        if l1 < len(s) and s[l1] == '-':
-            n1 = Number(float(s[0: l1]))
-            return Subtraction(n1, parse(s[l1 + 1:]))
+        if char in '+-x/':
+            while precedence(char) <= precedence(stack[-1]):
+                output = f'{output}{stack.pop()}'
+            stack.append(char)
 
-        return Number(float(s[0:l1]))
+        if char == ')':
+            while True:
+                c = stack.pop()
+                if c == '(':
+                    break
+                output = f'{output}{c}'
 
-
-def number_length(s: str) -> int:
-    length = 1
-    if not s[0].isdigit():
-        raise Exception('The first character in the string is not a digit')
-    while 1:
-        if length > len(s) - 1 or not s[length].isdigit() and s[length] != '.':
-            return length
-        length += 1
+    return reverse_string(output)
 
 
-x = parse('7x4')
-print(x.evaluate())
+def reverse_string(s: str) -> str:
+    output: str = ''
+
+    for char in s:
+        if char == '(':
+            output = f'){output}'
+        elif char == ')':
+            output = f'({output}'
+        else:
+            output = f'{char}{output}'
+    return output
+
+
+def precedence(char: str) -> int:
+    if char == '+' or char == '-':
+        return 2
+    if char == 'x' or char == '/':
+        return 3
+    return 1
+
+
+print(infix_to_prefix('21x(5+16)'))
