@@ -96,10 +96,11 @@ def parser(postfix: str, stack=None) -> float:
         return stack[0].evaluate()
     postfix: str = postfix
 
-    if postfix[0].isdigit():
+    if postfix[0].isdigit() or postfix[0] == '.':
         n = 1
-        while postfix[n].isdigit():
+        while postfix[n].isdigit() or postfix[n] == '.':
             n += 1
+        print(postfix[0:n])
         stack.append(Number(float(postfix[0:n])))
         return parser(postfix[n+1:], stack)
 
@@ -136,12 +137,12 @@ def infix_converter(s: str, option: str) -> str:
     output: str = ''
 
     for i in range(len(infix)):
-        if infix[i].isdigit():
+        if infix[i].isdigit() or infix[i] == '.':
             n = i + 1 if option == 'postfix' else i - 1
-            if not infix[n].isdigit():
-                output = f'{output}{infix[i]}!' if option == 'postfix' else f'{output}!{infix[i]}'
-            else:
+            if infix[n] == '.' or infix[n].isdigit():
                 output = f'{output}{infix[i]}'
+            else:
+                output = f'{output}{infix[i]}!' if option == 'postfix' else f'{output}!{infix[i]}'
 
         if infix[i] == '(':
             stack.append(infix[i])
@@ -182,16 +183,9 @@ def precedence(char: str) -> int:
     return 1
 
 
-def expression_stack_reader(stack: list):
-    arr = []
-    for i in range(len(stack)):
-        arr.append(stack[i].evaluate())
-    print(arr)
-
-
-print(infix_converter('21/(5+16)', 'postfix'))
-print(parser(infix_converter('21/(5+16)', 'postfix')))
-print(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix'))
-print(parser(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix')))
-print(infix_converter('(365+34)x(5x(76+3))', 'postfix'))
-print(parser(infix_converter('(365+34)x(5x(76+3))', 'postfix')))
+# print(infix_converter('21/(5+16)', 'postfix'))
+# print(parser(infix_converter('21/(5+16)', 'postfix')))
+# print(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix'))
+# print(parser(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix')))
+# print(infix_converter('(365+34)x(5x(76+3))', 'postfix'))
+# print(parser(infix_converter('(365+34)x(5x(76+3))', 'postfix')))
