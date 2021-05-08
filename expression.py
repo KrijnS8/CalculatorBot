@@ -88,31 +88,77 @@ class PI(Expression):
         return pi
 
 
-def infix_to_prefix(s) -> str:
+def parser(postfix: str, stack=None) -> float:
+    if stack is None:
+        stack = []
+    stack: list = stack
+    if len(postfix) == 0:
+        return stack[0].evaluate()
+    postfix: str = postfix
+
+    if postfix[0].isdigit():
+        n = 1
+        while postfix[n].isdigit():
+            n += 1
+        stack.append(Number(float(postfix[0:n])))
+        return parser(postfix[n+1:], stack)
+
+    if postfix[0] == '+':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Addition(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == '-':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Subtraction(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == 'x':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Multiplication(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == '/':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Division(n1, n2))
+        return parser(postfix[1:], stack)
+
+
+def infix_converter(s: str, option: str) -> str:
     stack: list = ['(']
-    infix: str = f'{reverse_string(s)})'
+    if option != 'postfix' and option != 'prefix':
+        raise Exception('Wrong option inputted')
+    infix: str = f'{s})' if option == 'postfix' else f'{reverse_string(s)})'
     output: str = ''
 
-    for char in infix:
-        if char.isdigit():
-            output = f'{output}{char}'
+    for i in range(len(infix)):
+        if infix[i].isdigit():
+            n = i + 1 if option == 'postfix' else i - 1
+            if not infix[n].isdigit():
+                output = f'{output}{infix[i]}!' if option == 'postfix' else f'{output}!{infix[i]}'
+            else:
+                output = f'{output}{infix[i]}'
 
-        if char == '(':
-            stack.append(char)
+        if infix[i] == '(':
+            stack.append(infix[i])
 
-        if char in '+-x/':
-            while precedence(char) <= precedence(stack[-1]):
+        if infix[i] in '+-x/':
+            while precedence(infix[i]) <= precedence(stack[-1]):
                 output = f'{output}{stack.pop()}'
-            stack.append(char)
+            stack.append(infix[i])
 
-        if char == ')':
+        if infix[i] == ')':
             while True:
                 c = stack.pop()
                 if c == '(':
                     break
                 output = f'{output}{c}'
 
-    return reverse_string(output)
+    return output if option == 'postfix' else reverse_string(output)
 
 
 def reverse_string(s: str) -> str:
@@ -136,4 +182,16 @@ def precedence(char: str) -> int:
     return 1
 
 
-print(infix_to_prefix('21x(5+16)'))
+def expression_stack_reader(stack: list):
+    arr = []
+    for i in range(len(stack)):
+        arr.append(stack[i].evaluate())
+    print(arr)
+
+
+print(infix_converter('21/(5+16)', 'postfix'))
+print(parser(infix_converter('21/(5+16)', 'postfix')))
+print(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix'))
+print(parser(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix')))
+print(infix_converter('(365+34)x(5x(76+3))', 'postfix'))
+print(parser(infix_converter('(365+34)x(5x(76+3))', 'postfix')))
