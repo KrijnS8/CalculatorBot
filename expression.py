@@ -14,7 +14,6 @@ class Number(Expression):
         self.value = v
 
     def evaluate(self) -> float:
-        print(f'Evaluate number: {self.value}')
         return self.value
 
 
@@ -31,7 +30,6 @@ class Addition(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate addition: {v1, v2}')
         return v1 + v2
 
 
@@ -39,7 +37,6 @@ class Subtraction(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate subtraction: {v1, v2}')
         return v1 - v2
 
 
@@ -47,7 +44,6 @@ class Multiplication(BinaryFunction):
     def evaluate(self) -> float:
         v1 = self.e1.evaluate()
         v2 = self.e2.evaluate()
-        print(f'Evaluate multiplication: {v1, v2}')
         return v1 * v2
 
 
@@ -59,7 +55,6 @@ class Division(BinaryFunction):
         if v2 == 0:
             raise Exception('Division by zero')
 
-        print(f'Evaluate division: {v1, v2}')
         return v1 / v2
 
 
@@ -73,50 +68,124 @@ class UnaryFunction(Expression):
 class Minus(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate minus: {-v}')
         return -v
 
 
 class Sqrt(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate sqrt: {v}')
         return sqrt(v)
 
 
 class Parenthesis(UnaryFunction):
     def evaluate(self) -> float:
         v = self.e.evaluate()
-        print(f'Evaluate parenthesis: {v}')
         return v
-
-
-class Zero(Expression):
-    def evaluate(self) -> float:
-        print('Evaluate zero: 0')
-        return 0
 
 
 class PI(Expression):
     def evaluate(self) -> float:
-        print(f'Evaluate PI: {pi}')
         return pi
 
 
-# e1 = Division(Number(42), Zero())
-# print(e1.evaluate())
-# # e = Addition(Minus(Number(42)), Sqrt(Number(420)))
-# # print(e.evaluate())
+def parser(postfix: str, stack=None) -> float:
+    if stack is None:
+        stack = []
+    stack: list = stack
+    if len(postfix) == 0:
+        return stack[0].evaluate()
+    postfix: str = postfix
+
+    if postfix[0].isdigit() or postfix[0] == '.':
+        n = 1
+        while postfix[n].isdigit() or postfix[n] == '.':
+            n += 1
+        print(postfix[0:n])
+        stack.append(Number(float(postfix[0:n])))
+        return parser(postfix[n+1:], stack)
+
+    if postfix[0] == '+':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Addition(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == '-':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Subtraction(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == 'x':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Multiplication(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == '/':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Division(n1, n2))
+        return parser(postfix[1:], stack)
 
 
-def parse(s: str) -> Expression:
-    if s.startswith('sqrt(') and s.endswith(')'):
-        return Sqrt(parse(s[5:-1]))
+def infix_converter(s: str, option: str) -> str:
+    stack: list = ['(']
+    if option != 'postfix' and option != 'prefix':
+        raise Exception('Wrong option inputted')
+    infix: str = f'{s})' if option == 'postfix' else f'{reverse_string(s)})'
+    output: str = ''
 
-    if s[0].isdigit():
-        return Number(float(s[0]))
+    for i in range(len(infix)):
+        if infix[i].isdigit() or infix[i] == '.':
+            n = i + 1 if option == 'postfix' else i - 1
+            if infix[n] == '.' or infix[n].isdigit():
+                output = f'{output}{infix[i]}'
+            else:
+                output = f'{output}{infix[i]}!' if option == 'postfix' else f'{output}!{infix[i]}'
+
+        if infix[i] == '(':
+            stack.append(infix[i])
+
+        if infix[i] in '+-x/':
+            while precedence(infix[i]) <= precedence(stack[-1]):
+                output = f'{output}{stack.pop()}'
+            stack.append(infix[i])
+
+        if infix[i] == ')':
+            while True:
+                c = stack.pop()
+                if c == '(':
+                    break
+                output = f'{output}{c}'
+
+    return output if option == 'postfix' else reverse_string(output)
 
 
-# e = parse('sqrt(sqrt(3))')
-# print(e.evaluate())
+def reverse_string(s: str) -> str:
+    output: str = ''
 
+    for char in s:
+        if char == '(':
+            output = f'){output}'
+        elif char == ')':
+            output = f'({output}'
+        else:
+            output = f'{char}{output}'
+    return output
+
+
+def precedence(char: str) -> int:
+    if char == '+' or char == '-':
+        return 2
+    if char == 'x' or char == '/':
+        return 3
+    return 1
+
+
+# print(infix_converter('21/(5+16)', 'postfix'))
+# print(parser(infix_converter('21/(5+16)', 'postfix')))
+# print(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix'))
+# print(parser(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix')))
+# print(infix_converter('(365+34)x(5x(76+3))', 'postfix'))
+# print(parser(infix_converter('(365+34)x(5x(76+3))', 'postfix')))
