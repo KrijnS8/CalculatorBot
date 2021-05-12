@@ -1,5 +1,6 @@
 from abc import ABC
 from math import sqrt, pi
+import re
 
 
 class Expression(ABC):
@@ -58,6 +59,13 @@ class Division(BinaryFunction):
         return v1 / v2
 
 
+class Root(BinaryFunction):
+    def evaluate(self) -> float:
+        v1 = self.e1.evaluate()
+        v2 = self.e2.evaluate()
+        return v1 ** v2
+
+
 class UnaryFunction(Expression):
     e: Expression = None
 
@@ -100,7 +108,6 @@ def parser(postfix: str, stack=None) -> float:
         n = 1
         while postfix[n].isdigit() or postfix[n] == '.':
             n += 1
-        print(postfix[0:n])
         stack.append(Number(float(postfix[0:n])))
         return parser(postfix[n+1:], stack)
 
@@ -128,6 +135,17 @@ def parser(postfix: str, stack=None) -> float:
         stack.append(Division(n1, n2))
         return parser(postfix[1:], stack)
 
+    if postfix[0] == '^':
+        n2 = stack.pop()
+        n1 = stack.pop()
+        stack.append(Root(n1, n2))
+        return parser(postfix[1:], stack)
+
+    if postfix[0] == '$':
+        n1 = stack.pop()
+        stack.append(Sqrt(n1))
+        return parser(postfix[1:], stack)
+
 
 def infix_converter(s: str, option: str) -> str:
     stack: list = ['(']
@@ -147,7 +165,7 @@ def infix_converter(s: str, option: str) -> str:
         if infix[i] == '(':
             stack.append(infix[i])
 
-        if infix[i] in '+-x/':
+        if infix[i] in '+-x/^$':
             while precedence(infix[i]) <= precedence(stack[-1]):
                 output = f'{output}{stack.pop()}'
             stack.append(infix[i])
@@ -180,9 +198,18 @@ def precedence(char: str) -> int:
         return 2
     if char == 'x' or char == '/':
         return 3
+    if char == '^' or char == '$':
+        return 4
     return 1
 
 
+def validate(s: str) -> bool:
+    allowed_chars = re.compile(r'[^0-9.+-/x^$() ]')
+    s = allowed_chars.search(s)
+    return not bool(s)
+
+
+# print(infix_converter('5+$(5+6)', 'postfix'))
 # print(infix_converter('21/(5+16)', 'postfix'))
 # print(parser(infix_converter('21/(5+16)', 'postfix')))
 # print(infix_converter('(5x(6+8)+3)x(9+54)', 'postfix'))

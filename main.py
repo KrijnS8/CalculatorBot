@@ -25,12 +25,12 @@ async def on_message(message):
     if message.content.startswith('!calculate'):
 
         content = message.content[len('!calculate '):]
-        solution = expression.parser(expression.infix_converter(content, 'postfix'))
 
-        if not solution and solution != 0:
-            await message.channel.send('The given equation is invalid')
+        if not expression.validate(content):
+            await message.channel.send('Invalid characters found!')
             return
 
+        solution = expression.parser(expression.infix_converter(content, 'postfix'))
         await message.channel.send(f'The answer is {solution}')
 
 
