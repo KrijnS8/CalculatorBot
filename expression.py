@@ -85,18 +85,18 @@ class Sqrt(UnaryFunction):
         return sqrt(v)
 
 
-class Parenthesis(UnaryFunction):
-    def evaluate(self) -> float:
-        v = self.e.evaluate()
-        return v
-
-
 class PI(Expression):
     def evaluate(self) -> float:
         return pi
 
 
 def parser(postfix: str, stack=None) -> float:
+    """
+    Function to parse an postfix expression and calculate it using function recursion
+    :param postfix: Postfix to parse (string)
+    :param stack: List of expressions (list)
+    :return: The answer to the expression
+    """
     if stack is None:
         stack = []
     stack: list = stack
@@ -148,6 +148,12 @@ def parser(postfix: str, stack=None) -> float:
 
 
 def infix_converter(s: str, option: str) -> str:
+    """
+    Function to convert infix to postfix or prefix
+    :param s: Infix to convert
+    :param option: Selection between postfix or prefix
+    :return: Postfix or prefix
+    """
     stack: list = ['(']
     if option != 'postfix' and option != 'prefix':
         raise Exception('Wrong option inputted')
